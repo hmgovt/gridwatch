@@ -7,6 +7,9 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Keep focused and scrolled-to elements clear of the sticky top bar and the tab bar. */
+  scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 76px);
+  scroll-padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
 }
 
 body {
@@ -98,6 +101,7 @@ fieldset {
 .choice-input {
   position: absolute;
   inset: 0;
+  z-index: 2;
   width: 100%;
   height: 100%;
   margin: 0;
