@@ -1,0 +1,172 @@
+/*
+ * Direction: "dusk instrument". A calm, cool paper by day and a dusk-blue night,
+ * with one bold element: the 24-hour settlement-period ring. Colour means
+ * household action (clear, heads-up, get ready, power off), never decoration.
+ *
+ * Layout: mobile-first single column with a bottom tab bar; from 960px a
+ * two-column instrument layout (sticky ring left, context right) with top nav.
+ */
+@property --glow {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+:root {
+  color-scheme: light;
+
+  --paper: #eef1f5;
+  --paper-2: #e5eaf1;
+  --card: #ffffff;
+  --card-2: #f5f7fa;
+  --ink: #0f1a2a;
+  --ink-2: #435168;
+  --ink-3: #5b697e;
+  --line: #dbe1ea;
+  --line-strong: #c2cbd8;
+  --accent: #2254d6;
+  --accent-ink: #1d47b8;
+  --accent-soft: #e2e9fb;
+  --on-accent: #ffffff;
+
+  --clear: #0c7f57;
+  --clear-mark: #16a06f;
+  --clear-soft: #dcf2e8;
+  --heads: #8f5a00;
+  --heads-mark: #dc9a12;
+  --heads-soft: #fbefd2;
+  --prep: #ae4310;
+  --prep-mark: #e4672a;
+  --prep-soft: #fbe3d5;
+  --off: #aa1e31;
+  --off-mark: #d8394d;
+  --off-soft: #f8dde2;
+  --unknown-mark: #8793a6;
+
+  --sky-1: #dfe7f3;
+  --sky-2: #eef1f5;
+  --glow-strength: 26%;
+  --callout-bg: #0f1a2a;
+  --callout-ink: #eef1f5;
+  --callout-muted: #b4c0d2;
+  --callout-tile: #1d2a3f;
+  --shadow-1: 0 1px 2px rgb(15 26 42 / 0.06);
+  --shadow-2: 0 1px 2px rgb(15 26 42 / 0.05), 0 12px 32px -16px rgb(15 26 42 / 0.25);
+  --scrim: rgb(15 26 42 / 0.32);
+
+  --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --t-xs: 0.75rem;
+  --t-s: 0.8125rem;
+  --t-m: 0.9375rem;
+  --t-body: 1rem;
+  --t-l: 1.125rem;
+  --t-xl: 1.375rem;
+  --t-2xl: 1.75rem;
+  --t-3xl: 2.375rem;
+
+  --r-s: 8px;
+  --r-m: 14px;
+  --r-l: 22px;
+  --gutter: 16px;
+  --tabbar-h: 64px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --paper: #0a111d;
+    --paper-2: #0f1827;
+    --card: #111b2b;
+    --card-2: #172336;
+    --ink: #e7edf6;
+    --ink-2: #a9b6c9;
+    --ink-3: #8a98ae;
+    --line: #223049;
+    --line-strong: #31415e;
+    --accent: #86a8ff;
+    --accent-ink: #a6c0ff;
+    --accent-soft: #1b2a4b;
+    --on-accent: #0a111d;
+    --clear: #5ad3a6;
+    --clear-mark: #43c795;
+    --clear-soft: #10302a;
+    --heads: #f4c35b;
+    --heads-mark: #f0b43c;
+    --heads-soft: #33290f;
+    --prep: #ff9a66;
+    --prep-mark: #fb8446;
+    --prep-soft: #3a2215;
+    --off: #ff7a89;
+    --off-mark: #f25d6f;
+    --off-soft: #3b1822;
+    --unknown-mark: #6d7b92;
+    --sky-1: #121d33;
+    --sky-2: #0a111d;
+    --glow-strength: 40%;
+    --callout-bg: #172336;
+    --callout-ink: #e7edf6;
+    --callout-muted: #a9b6c9;
+    --callout-tile: #22314b;
+    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.3);
+    --shadow-2: 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 40px -18px rgb(0 0 0 / 0.7);
+    --scrim: rgb(3 7 14 / 0.6);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #0a111d;
+  --paper-2: #0f1827;
+  --card: #111b2b;
+  --card-2: #172336;
+  --ink: #e7edf6;
+  --ink-2: #a9b6c9;
+  --ink-3: #8a98ae;
+  --line: #223049;
+  --line-strong: #31415e;
+  --accent: #86a8ff;
+  --accent-ink: #a6c0ff;
+  --accent-soft: #1b2a4b;
+  --on-accent: #0a111d;
+  --clear: #5ad3a6;
+  --clear-mark: #43c795;
+  --clear-soft: #10302a;
+  --heads: #f4c35b;
+  --heads-mark: #f0b43c;
+  --heads-soft: #33290f;
+  --prep: #ff9a66;
+  --prep-mark: #fb8446;
+  --prep-soft: #3a2215;
+  --off: #ff7a89;
+  --off-mark: #f25d6f;
+  --off-soft: #3b1822;
+  --unknown-mark: #6d7b92;
+  --sky-1: #121d33;
+  --sky-2: #0a111d;
+  --glow-strength: 40%;
+  --callout-bg: #172336;
+  --callout-ink: #e7edf6;
+  --callout-muted: #a9b6c9;
+  --callout-tile: #22314b;
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-2: 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 40px -18px rgb(0 0 0 / 0.7);
+  --scrim: rgb(3 7 14 / 0.6);
+}
+
+/* Household level -> colour set. Components read --status* only. */
+.lvl-clear { --status: var(--clear); --status-mark: var(--clear-mark); --status-soft: var(--clear-soft); }
+.lvl-headsup { --status: var(--heads); --status-mark: var(--heads-mark); --status-soft: var(--heads-soft); }
+.lvl-prepare { --status: var(--prep); --status-mark: var(--prep-mark); --status-soft: var(--prep-soft); }
+.lvl-off { --status: var(--off); --status-mark: var(--off-mark); --status-soft: var(--off-soft); }
+.lvl-unknown { --status: var(--ink-2); --status-mark: var(--unknown-mark); --status-soft: var(--card-2); }
+
+/* National level -> colour set (0 normal ... 4 rotating cuts). */
+.nat-0 { --nat: var(--clear-mark); --nat-ink: var(--clear); --nat-soft: var(--clear-soft); }
+.nat-1 { --nat: var(--accent); --nat-ink: var(--accent-ink); --nat-soft: var(--accent-soft); }
+.nat-2 { --nat: var(--heads-mark); --nat-ink: var(--heads); --nat-soft: var(--heads-soft); }
+.nat-3 { --nat: var(--prep-mark); --nat-ink: var(--prep); --nat-soft: var(--prep-soft); }
+.nat-4 { --nat: var(--off-mark); --nat-ink: var(--off); --nat-soft: var(--off-soft); }

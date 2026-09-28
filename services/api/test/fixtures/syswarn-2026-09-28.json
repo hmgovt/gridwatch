@@ -1,0 +1,29 @@
+{
+  "_note": "Synthetic records in the shape of Elexon's SYSWARN dataset, recreating the 28 Sep 2026 notice from public reporting. Not official text.",
+  "data": [
+    {
+      "dataset": "SYSWARN",
+      "publishTime": "2026-09-27T23:57:00Z",
+      "warningType": "ELECTRICITY MARGIN NOTICE",
+      "warningText": "ELECTRICITY MARGIN NOTICE. NESO has identified a system margin shortfall of 1,400MW for the period 16:00 to 19:00 on 28/09/2026."
+    },
+    {
+      "dataset": "SYSWARN",
+      "publishTime": "2026-09-28T11:42:00Z",
+      "warningType": "ELECTRICITY MARGIN NOTICE",
+      "warningText": "ELECTRICITY MARGIN NOTICE (UPDATE). The system margin shortfall for the period 16:00 to 19:00 on 28/09/2026 is now 104MW."
+    },
+    {
+      "dataset": "SYSWARN",
+      "publishTime": "2026-09-28T14:58:00Z",
+      "warningType": "ELECTRICITY MARGIN NOTICE",
+      "warningText": "The ELECTRICITY MARGIN NOTICE for the period 16:00 to 19:00 on 28/09/2026 has been CANCELLED."
+    },
+    {
+      "dataset": "SYSWARN",
+      "publishTime": "2026-09-28T09:00:00Z",
+      "warningType": "NRAPM",
+      "warningText": "Negative Reserve Active Power Margin warning for overnight period."
+    }
+  ]
+}

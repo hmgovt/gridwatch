@@ -1,0 +1,8 @@
+{
+  "_note": "Synthetic records in the shape of Elexon's loss of load probability and de-rated margin forecast.",
+  "data": [
+    { "publishTime": "2026-09-28T11:30:00Z", "settlementDate": "2026-09-28", "settlementPeriod": 33, "startTime": "2026-09-28T15:00:00Z", "forecastHorizon": 4, "lossOfLoadProbability": 0.0021, "deratedMargin": 1520.5 },
+    { "publishTime": "2026-09-28T11:30:00Z", "settlementDate": "2026-09-28", "settlementPeriod": 36, "startTime": "2026-09-28T16:30:00Z", "forecastHorizon": 4, "lossOfLoadProbability": 0.0142, "deratedMargin": 1050 },
+    { "publishTime": "2026-09-28T03:30:00Z", "settlementDate": "2026-09-28", "settlementPeriod": 36, "startTime": "2026-09-28T16:30:00Z", "forecastHorizon": 12, "lossOfLoadProbability": 0.03, "deratedMargin": 800 }
+  ]
+}

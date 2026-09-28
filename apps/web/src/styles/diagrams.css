@@ -1,0 +1,222 @@
+/* Escalation ladder */
+.ladder {
+  position: relative;
+  margin: 0;
+}
+
+.ladder-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ladder-rung {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 4px 14px;
+  padding: 10px 0;
+}
+
+.ladder-trigger {
+  grid-column: 2 / -1;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+
+.ladder-rung:not(:first-child)::before {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: -10px;
+  height: 40px;
+  width: 2px;
+  background: var(--line-strong);
+}
+
+.ladder-node {
+  grid-column: 1;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--t-m);
+  background: var(--card);
+  border: 2px solid var(--nat);
+  color: var(--nat-ink);
+  position: relative;
+  z-index: 1;
+}
+
+.ladder-rung.is-current .ladder-node,
+.ladder-rung.is-passed .ladder-node {
+  background: var(--nat);
+  color: var(--card);
+}
+
+.ladder-rung.is-current .ladder-node {
+  box-shadow: 0 0 0 6px var(--nat-soft);
+  animation: ladder-pulse 2.4s var(--ease) infinite;
+}
+
+@keyframes ladder-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px var(--nat-soft); }
+  50% { box-shadow: 0 0 0 9px var(--nat-soft); }
+}
+
+.ladder-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-top: 6px;
+}
+
+.ladder-text strong {
+  font-size: var(--t-l);
+}
+
+.ladder-official {
+  font-size: var(--t-s);
+  font-weight: 600;
+  color: var(--nat-ink);
+}
+
+.ladder-now {
+  margin-top: 8px;
+}
+
+.ladder-return {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: var(--r-s);
+  background: var(--clear-soft);
+  color: var(--clear);
+  font-size: var(--t-s);
+  font-weight: 600;
+}
+
+.ladder-return .icon {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  margin-top: 1px;
+}
+
+.ladder figcaption,
+.flow figcaption {
+  margin-top: 12px;
+  color: var(--ink-2);
+  font-size: var(--t-m);
+  max-width: 62ch;
+}
+
+/* North-south flow */
+.flow {
+  margin: 0;
+}
+
+.flow-svg {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.flow-zone {
+  stroke-width: 1.5;
+}
+
+.flow-north {
+  fill: var(--accent-soft);
+  stroke: color-mix(in oklab, var(--accent) 35%, transparent);
+}
+
+.flow-south {
+  fill: var(--card-2);
+  stroke: var(--line-strong);
+}
+
+.flow-zone-title {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 17px;
+  fill: var(--ink);
+}
+
+.flow-zone-sub {
+  font-size: 12.5px;
+  fill: var(--ink-2);
+}
+
+.flow-label {
+  font-size: 13px;
+  font-weight: 650;
+  fill: var(--ink);
+}
+
+.flow-label-sub {
+  font-size: 12px;
+  fill: var(--ink-2);
+}
+
+.flow-wall {
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.flow-pipe {
+  fill: none;
+  stroke: var(--accent);
+  stroke-opacity: 0.25;
+  stroke-width: 10;
+  stroke-linecap: round;
+}
+
+.flow-dot {
+  fill: var(--accent);
+}
+
+.flow-side {
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 2;
+  stroke-dasharray: 4 5;
+}
+
+.flow-arrowhead {
+  fill: var(--ink-3);
+}
+
+.turbine-mast {
+  stroke: var(--ink-3);
+  stroke-width: 2;
+}
+
+.turbine-blades {
+  fill: var(--ink-2);
+}
+
+.turbine-hub {
+  fill: var(--ink-2);
+}

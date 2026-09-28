@@ -1,0 +1,28 @@
+{
+  "name": "gridwatch",
+  "private": true,
+  "description": "Early warning of GB power disruptions: national grid notices, rotating power cuts and (soon) local fault risk.",
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @gridwatch/web --filter @gridwatch/api dev",
+    "dev:web": "pnpm --filter @gridwatch/web dev",
+    "dev:api": "pnpm --filter @gridwatch/api dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "lint": "oxlint --deny-warnings packages apps services",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "build:artifact": "pnpm --filter @gridwatch/web build:artifact",
+    "icons": "node apps/web/scripts/render-icons.mjs",
+    "screenshots": "node apps/web/scripts/screenshots.mjs"
+  },
+  "devDependencies": {
+    "oxlint": "1.85.0",
+    "typescript": "7.0.2",
+    "playwright-core": "1.63.0"
+  }
+}

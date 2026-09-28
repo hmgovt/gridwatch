@@ -1,0 +1,13 @@
+packages:
+  - packages/*
+  - apps/*
+  - services/*
+
+# Supply-chain hardening: pnpm 10 does not run dependency lifecycle scripts
+# unless they are explicitly allowed here. Keep this list empty unless a
+# dependency genuinely needs a build step, and review it when it changes.
+onlyBuiltDependencies: []
+
+# Refuse versions published less than a day ago (gives the ecosystem time to
+# catch compromised releases before they reach us).
+minimumReleaseAge: 1440

@@ -1,0 +1,207 @@
+.ring {
+  --glow: color-mix(in oklab, var(--status-mark) var(--glow-strength), transparent);
+  position: relative;
+  width: min(100%, 380px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  color: var(--status-mark);
+  transition: --glow 900ms var(--ease), color 600ms var(--ease);
+}
+
+.ring-glow {
+  position: absolute;
+  inset: 20%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--glow), transparent);
+  filter: blur(18px);
+  animation: ring-breathe 7s ease-in-out infinite;
+}
+
+@keyframes ring-breathe {
+  0%, 100% { transform: scale(0.94); opacity: 0.75; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+
+.ring-svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.tick {
+  stroke: var(--line-strong);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  animation: tick-in 500ms var(--ease) both;
+  animation-delay: calc(var(--i) * 9ms);
+}
+
+.tick-major {
+  stroke: var(--ink-3);
+  stroke-width: 2;
+}
+
+.tick-now {
+  stroke: currentColor;
+  stroke-width: 3;
+}
+
+@keyframes tick-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ring-hour {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  fill: var(--ink-3);
+}
+
+.ring-track {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 12;
+}
+
+.ring-elapsed {
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-opacity: 0.16;
+  stroke-width: 12;
+}
+
+.ring-lane {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 2;
+  stroke-dasharray: 2 6;
+}
+
+.arc-notice {
+  fill: none;
+  stroke: var(--nat);
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+
+.ring-peak {
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1 5;
+}
+
+.arc-line {
+  fill: none;
+  stroke-width: 12;
+  stroke-linecap: round;
+}
+
+.arc-focus .arc-line {
+  stroke: currentColor;
+  stroke-width: 14;
+}
+
+.arc-halo {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 26;
+  stroke-opacity: 0.18;
+  stroke-linecap: round;
+}
+
+.now-dot {
+  fill: var(--card);
+  stroke: currentColor;
+  stroke-width: 3.5;
+}
+
+.now-halo {
+  fill: currentColor;
+  opacity: 0.35;
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: now-pulse 2.6s var(--ease) infinite;
+}
+
+@keyframes now-pulse {
+  0% { transform: scale(1); opacity: 0.45; }
+  80%, 100% { transform: scale(2.6); opacity: 0; }
+}
+
+.ring-centre {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.ring-kicker {
+  font-size: var(--t-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.ring-word {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 8.5vw, 2.5rem);
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  color: var(--status);
+}
+
+.ring-time {
+  font-size: var(--t-s);
+  color: var(--ink-2);
+}
+
+.ring-legend {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 16px;
+  font-size: var(--t-s);
+  color: var(--ink-2);
+}
+
+.ring-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.legend-swatch {
+  width: 18px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--nat);
+}
+
+.legend-notice {
+  height: 5px;
+}
+
+.legend-focus {
+  background: var(--status-mark);
+}
+
+.legend-peak {
+  height: 0;
+  border-top: 2.5px dotted var(--ink-3);
+  border-radius: 0;
+  background: none;
+}

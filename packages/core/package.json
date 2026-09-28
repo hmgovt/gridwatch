@@ -1,0 +1,18 @@
+{
+  "name": "@gridwatch/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pure domain logic shared by the web app, native shells and the API: notices, headroom, rota blocks, personal status and alert rules.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "5.0.2"
+  }
+}

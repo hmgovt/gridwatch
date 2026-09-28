@@ -1,0 +1,23 @@
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+
+# Local runtime data (SQLite, raw feed archive). Never commit.
+services/api/data/
+*.sqlite
+*.sqlite-*
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Native shells, once added with Capacitor
+apps/web/ios/
+apps/web/android/
+
+# Preview build output
+apps/web/dist-artifact/
+apps/web/artifact/
