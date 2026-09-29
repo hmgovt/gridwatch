@@ -147,6 +147,11 @@ export function Onboarding() {
                     {alerts.error}
                   </p>
                 )}
+                {alerts.error && alerts.openSettings && (
+                  <button type="button" className="btn" onClick={alerts.openSettings}>
+                    Open notification settings
+                  </button>
+                )}
                 <div className="onboarding-actions">
                   {!IS_ARTIFACT && alerts.support === 'supported' ? (
                     <button

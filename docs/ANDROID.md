@@ -7,7 +7,8 @@ The Android app (`uk.everybodyhz.app`) is the web app built with `--mode native`
 1. Get `everybody-hz-0.1.0.apk` (sent directly, or from the **everybody-hz-test-apk** artifact of a CI run).
 2. Open it on the phone. Android asks you to allow installs from that app (your browser or file manager) the first time.
 3. Open **everybody Hz**, set your rota letter, and turn on alerts. Android 13 and later asks for notification permission.
-4. **Settings → Send a test alert** checks that notifications arrive.
+4. **Settings → Send a test alert** checks that notifications arrive. Under it, **Last check** shows when the background check last ran and what it found.
+5. If notifications were refused, **Open notification settings** goes straight to the right Android screen. On Samsung phones, also consider **Settings → Battery → Background usage limits** and keep everybody Hz out of "Sleeping apps", or One UI may hold back the background check.
 
 Test builds are signed with a public test key ([test-signing/README.md](../apps/web/android/test-signing/README.md)), so each new build installs over the last one. Uninstall a test build before installing a store build.
 
@@ -18,7 +19,7 @@ Test builds are signed with a public test key ([test-signing/README.md](../apps/
 | Live status | `src/data/direct.ts` | While the app is open, fetches NESO's system warnings (7 days), the spare-capacity forecast (every 10 minutes at most) and frequency (last 10 minutes) from `data.elexon.co.uk`, then builds the status with the same `@gridwatch/core` code the server uses. Keeps the last good data for offline use. |
 | Background check | `AlertWorker.java` | WorkManager job, about every 15 minutes and only with a network connection. Fetches recent warnings and raises a notification for each new one the person's alert level covers. Android may defer runs in Doze or battery saver. |
 | Classifier | `WarningClassifier.java` | A Java port of the core patterns and alert rules. `apps/web/test/native-parity.test.ts` fails if the patterns drift, and JUnit tests run it against NESO's real messages from 28 September 2026. |
-| Plugin | `GridAlertsPlugin.java` ↔ `src/platform/native.ts` | Notification permission, turning the background check on and off, the test alert, and opening the right screen when a notification is tapped. |
+| Plugin | `GridAlertsPlugin.java` ↔ `src/platform/native.ts` | Notification permission, turning the background check on and off, the test alert, the last-check status, opening Android's notification settings, and opening the right screen when a notification is tapped. |
 | Notifications | `Notifier.java` | Two channels, "Power cut warnings" (high importance) and "Grid notices" (default), so people can silence routine notices and keep urgent ones loud. A stand-down replaces the original notification. |
 
 ### Differences from web push
@@ -26,6 +27,10 @@ Test builds are signed with a public test key ([test-signing/README.md](../apps/
 - Updates to a notice aren't notified; neither are they on the web. The worker threads messages by kind and date, the way `buildNotices` does, to tell an update from a new notice.
 - A cancellation is only notified if the phone notified the original notice.
 - Rotating power cut **schedules** have no public machine-readable feed yet, so the phone can't show block times; it notifies if NESO's system warnings announce rotations. On the web this comes from the server's operator route.
+
+### A pitfall: never await the plugin object
+
+Capacitor's plugin object answers every property, `then` included. If a promise resolves *to* the plugin, JavaScript treats it as a promise and calls a native `then()` that never settles. That made "Turn on alerts" hang in the first test build (0.1.0). Use `withPlugin` in `src/platform/alerts.ts`; `apps/web/test/device-alerts.test.ts` guards against it coming back.
 
 ## Permissions
 

@@ -36,6 +36,9 @@ public class AlertWorker extends Worker {
     static final String KEY_SEEN = "seen";
     /** Notices we've alerted about and not yet seen cancelled: "KIND|date|firstPublishTime". */
     static final String KEY_OPEN = "open";
+    /** For the Settings screen: when the check last ran, and what happened. */
+    static final String KEY_LAST_CHECK = "lastCheck";
+    static final String KEY_LAST_RESULT = "lastResult";
 
     private static final String BASE = "https://data.elexon.co.uk/bmrs/api/v1/datasets/SYSWARN";
     private static final long MINUTE = 60_000L;
@@ -55,16 +58,25 @@ public class AlertWorker extends Worker {
     public Result doWork() {
         SharedPreferences prefs = getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         if (!prefs.getBoolean(KEY_ENABLED, false)) return Result.success();
+        long now = System.currentTimeMillis();
         try {
-            check(getApplicationContext(), prefs, System.currentTimeMillis());
+            int notified = check(getApplicationContext(), prefs, now);
+            record(prefs, now, notified == 0 ? "ok" : "notified " + notified);
             return Result.success();
         } catch (Exception e) {
             // Network trouble or an unexpected response: try again at the next run.
+            record(prefs, now, "failed: " + e.getClass().getSimpleName());
             return Result.retry();
         }
     }
 
-    static void check(Context context, SharedPreferences prefs, long now) throws Exception {
+    private static void record(SharedPreferences prefs, long at, String result) {
+        prefs.edit().putLong(KEY_LAST_CHECK, at).putString(KEY_LAST_RESULT, result).apply();
+    }
+
+    /** Returns how many notifications were posted. */
+    static int check(Context context, SharedPreferences prefs, long now) throws Exception {
+        int notified = 0;
         long since = Math.max(prefs.getLong(KEY_SINCE, now) - 10 * MINUTE, now - ALERTABLE_AGE);
         String url = BASE + "?publishDateTimeFrom=" + encode(iso(since)) + "&publishDateTimeTo=" + encode(iso(now + 5 * MINUTE)) + "&format=json";
         JSONArray data = new JSONObject(fetch(url)).getJSONArray("data");
@@ -108,12 +120,13 @@ public class AlertWorker extends Worker {
             String firstPublished = existing.substring(prefix.length());
             String path = "/notices/" + result.kind.name().toLowerCase(Locale.UK) + "-" + firstPublished.replace("-", "").replace(":", "");
             WarningClassifier.Alert alert = WarningClassifier.alertFor(result, sensitivity, now, path);
-            if (alert != null) Notifier.show(context, existing.hashCode(), alert);
+            if (alert != null && Notifier.show(context, existing.hashCode(), alert)) notified++;
         }
 
         // Keep the newest keys only; ISO timestamps sort in time order.
         while (seen.size() > MAX_SEEN) seen.remove(((TreeSet<String>) seen).first());
         prefs.edit().putStringSet(KEY_SEEN, seen).putStringSet(KEY_OPEN, open).putLong(KEY_SINCE, now).apply();
+        return notified;
     }
 
     private static String fetch(String address) throws Exception {

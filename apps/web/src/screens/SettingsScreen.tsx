@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { SENSITIVITIES, type Sensitivity } from '@gridwatch/core';
+import { formatRelative, SENSITIVITIES, type Sensitivity } from '@gridwatch/core';
 import { brand } from '../brand.ts';
 import { Icon } from '../components/Icon.tsx';
 import { LetterPicker } from '../components/LetterPicker.tsx';
@@ -7,7 +7,7 @@ import { Segmented } from '../components/Segmented.tsx';
 import { useToast } from '../components/Toast.tsx';
 import { useData } from '../data/DataProvider.tsx';
 import { IS_ARTIFACT } from '../platform/index.ts';
-import { useAlerts } from '../state/alerts.ts';
+import { useAlerts, useBackgroundStatus } from '../state/alerts.ts';
 import { usePrefs, type ThemeChoice } from '../state/prefs.tsx';
 import { useUi } from '../state/ui.tsx';
 
@@ -98,6 +98,7 @@ function AlertsCard() {
   const { prefs, update } = usePrefs();
   const alerts = useAlerts();
   const toast = useToast();
+  const background = useBackgroundStatus(alerts.enabled && alerts.kind === 'device');
 
   const blocked = alerts.support !== 'supported';
   const permissionDenied =
@@ -180,10 +181,28 @@ function AlertsCard() {
             {alerts.error}
           </p>
         )}
+        {alerts.error && alerts.openSettings && (
+          <button type="button" className="btn" onClick={alerts.openSettings}>
+            <Icon name="bell" />
+            Open notification settings
+          </button>
+        )}
         {alerts.kind === 'device' && (
           <p className="muted small-note">
             Your phone checks NESO’s warnings about every 15 minutes, even with the app closed. Android sometimes waits longer to save
             battery, so treat an alert as a prompt, not a guarantee.
+            {background && (
+              <>
+                {' '}
+                <span className="mono">
+                  Last check:{' '}
+                  {background.lastCheckAt
+                    ? `${formatRelative(new Date(background.lastCheckAt), new Date())}${background.lastResult && background.lastResult !== 'ok' ? ` (${background.lastResult})` : ''}`
+                    : 'not yet'}
+                  .
+                </span>
+              </>
+            )}
           </p>
         )}
       </div>

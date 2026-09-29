@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { platform } from '../platform/index.ts';
+import type { BackgroundStatus } from '../platform/native.ts';
 import { usePrefs } from './prefs.tsx';
 
 /** Turn alerts on and off, and keep the alert service's copy of preferences in step. */
@@ -45,7 +46,36 @@ export function useAlerts() {
     }
   };
 
-  return { enabled: !!alerts, busy, error, enable, disable, test, support: service.support(), kind: service.kind };
+  const openSettings = service.openSystemSettings
+    ? async () => {
+        await service.openSystemSettings?.().catch(() => undefined);
+      }
+    : undefined;
+
+  return { enabled: !!alerts, busy, error, enable, disable, test, openSettings, support: service.support(), kind: service.kind };
+}
+
+/** In the Android app, what the background check last did. Refreshed every minute while shown. */
+export function useBackgroundStatus(enabled: boolean): BackgroundStatus | null {
+  const [status, setStatus] = useState<BackgroundStatus | null>(null);
+  useEffect(() => {
+    const read = platform.alerts.backgroundStatus;
+    if (!enabled || !read) return;
+    let live = true;
+    const load = () =>
+      void read()
+        .then((s) => {
+          if (live) setStatus(s);
+        })
+        .catch(() => undefined);
+    load();
+    const id = window.setInterval(load, 60_000);
+    return () => {
+      live = false;
+      window.clearInterval(id);
+    };
+  }, [enabled]);
+  return enabled ? status : null;
 }
 
 /** Pass preference changes to the alert service shortly after they happen. */

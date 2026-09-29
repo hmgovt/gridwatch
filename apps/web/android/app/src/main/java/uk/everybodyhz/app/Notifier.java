@@ -39,8 +39,9 @@ final class Notifier {
             || ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
     }
 
-    static void show(Context context, int id, WarningClassifier.Alert alert) {
-        if (!allowed(context)) return;
+    /** Returns false if notifications are off for the app. */
+    static boolean show(Context context, int id, WarningClassifier.Alert alert) {
+        if (!allowed(context)) return false;
         ensureChannels(context);
         Intent open = new Intent(context, MainActivity.class)
             .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -64,8 +65,10 @@ final class Notifier {
             .setAutoCancel(true);
         try {
             NotificationManagerCompat.from(context).notify(id, builder.build());
+            return true;
         } catch (SecurityException e) {
-            // Permission withdrawn between the check and the post: nothing to do.
+            // Permission withdrawn between the check and the post.
+            return false;
         }
     }
 }

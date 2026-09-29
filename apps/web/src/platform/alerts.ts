@@ -1,5 +1,6 @@
 import type { RotaLetter, Sensitivity } from '@gridwatch/core';
 import { api } from '../data/api.ts';
+import type { BackgroundStatus, GridAlertsPlugin } from './native.ts';
 import { webPush, type PushSupport } from './push.ts';
 
 /**
@@ -27,6 +28,10 @@ export interface AlertService {
   disable(registration: AlertRegistration | null): Promise<void>;
   /** Sends a sample alert; resolves to a short result for the user. */
   test(registration: AlertRegistration): Promise<string>;
+  /** Native only: open this app's notification settings. */
+  openSystemSettings?(): Promise<void>;
+  /** Native only: what the background check last did. */
+  backgroundStatus?(): Promise<BackgroundStatus>;
 }
 
 export const serverAlerts: AlertService = {
@@ -55,30 +60,41 @@ export const serverAlerts: AlertService = {
   },
 };
 
-/** Loaded on demand so web builds never include the native bridge. */
-const nativePlugin = () => import('./native.ts').then((m) => m.GridAlerts);
+/**
+ * Run `use` with the native plugin, loaded on demand so web builds never
+ * include the bridge. The plugin must never be the value a promise resolves
+ * to: Capacitor's plugin object answers every property, `then` included, so a
+ * promise would treat it as a thenable and wait forever on a native `then()`.
+ * It stays inside the module object and this callback.
+ */
+async function withPlugin<T>(use: (plugin: GridAlertsPlugin) => Promise<T>): Promise<T> {
+  const native = await import('./native.ts');
+  return use(native.GridAlerts);
+}
 
 export const deviceAlerts: AlertService = {
   kind: 'device',
   support: () => 'supported',
-  async enable(settings) {
-    const plugin = await nativePlugin();
-    const { notifications } = await plugin.requestPermissions();
-    if (notifications !== 'granted') throw new Error('Notifications are turned off for everybody Hz in Android settings.');
-    await plugin.configure({ enabled: true, sensitivity: settings.sensitivity });
-    return { id: 'device', token: '' };
-  },
-  async update(_registration, settings) {
-    await (await nativePlugin()).configure({ enabled: true, sensitivity: settings.sensitivity });
-    return true;
-  },
-  async disable() {
-    await (await nativePlugin()).configure({ enabled: false, sensitivity: 'balanced' });
-  },
-  async test() {
-    await (await nativePlugin()).testAlert();
-    return 'sent';
-  },
+  enable: (settings) =>
+    withPlugin(async (plugin) => {
+      const { notifications } = await plugin.requestPermissions();
+      if (notifications !== 'granted') throw new Error('Notifications are turned off for everybody Hz. Allow them in Android settings.');
+      await plugin.configure({ enabled: true, sensitivity: settings.sensitivity });
+      return { id: 'device', token: '' };
+    }),
+  update: (_registration, settings) =>
+    withPlugin(async (plugin) => {
+      await plugin.configure({ enabled: true, sensitivity: settings.sensitivity });
+      return true;
+    }),
+  disable: () => withPlugin((plugin) => plugin.configure({ enabled: false, sensitivity: 'balanced' })),
+  test: () =>
+    withPlugin(async (plugin) => {
+      await plugin.testAlert();
+      return 'sent';
+    }),
+  openSystemSettings: () => withPlugin((plugin) => plugin.openSettings()),
+  backgroundStatus: () => withPlugin((plugin) => plugin.status()),
 };
 
 export const noAlerts: AlertService = {

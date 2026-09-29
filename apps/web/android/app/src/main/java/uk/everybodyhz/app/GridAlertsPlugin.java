@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.provider.Settings;
 import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
@@ -118,6 +119,39 @@ public class GridAlertsPlugin extends Plugin {
         work.enqueueUniquePeriodicWork(WORK_PERIODIC, ExistingPeriodicWorkPolicy.UPDATE, periodic);
         work.enqueueUniqueWork(WORK_NOW, ExistingWorkPolicy.REPLACE, new OneTimeWorkRequest.Builder(AlertWorker.class).setConstraints(online).build());
         call.resolve();
+    }
+
+    /** Open this app's notification settings, for when permission was refused. */
+    @PluginMethod
+    public void openSettings(PluginCall call) {
+        Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            .putExtra(Settings.EXTRA_APP_PACKAGE, getContext().getPackageName())
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        try {
+            getContext().startActivity(intent);
+        } catch (Exception e) {
+            // Some builds lack the direct screen: fall back to the app's details page.
+            getContext()
+                .startActivity(
+                    new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        .setData(android.net.Uri.fromParts("package", getContext().getPackageName(), null))
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                );
+        }
+        call.resolve();
+    }
+
+    /** What the background check last did, so testers can see it running. */
+    @PluginMethod
+    public void status(PluginCall call) {
+        SharedPreferences prefs = getContext().getSharedPreferences(AlertWorker.PREFS, Context.MODE_PRIVATE);
+        JSObject result = new JSObject();
+        result.put("enabled", prefs.getBoolean(AlertWorker.KEY_ENABLED, false));
+        result.put("permission", (Notifier.allowed(getContext()) ? PermissionState.GRANTED : PermissionState.DENIED).toString());
+        long last = prefs.getLong(AlertWorker.KEY_LAST_CHECK, 0L);
+        result.put("lastCheckAt", last > 0 ? last : JSObject.NULL);
+        result.put("lastResult", prefs.getString(AlertWorker.KEY_LAST_RESULT, null));
+        call.resolve(result);
     }
 
     @PluginMethod
