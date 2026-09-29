@@ -200,6 +200,8 @@
   border-radius: var(--r-s);
   background: var(--card-2);
   font-size: var(--t-s);
+  line-height: 1.5;
+  white-space: pre-line;
   overflow-wrap: anywhere;
 }
 

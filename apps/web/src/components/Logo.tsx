@@ -1,29 +1,37 @@
 import { brand } from '../brand.ts';
 
-/** The mark: a day ring with an evening marker. Echoes the status ring. */
-export function LogoMark({ size = 28 }: { size?: number }) {
-  const ticks = Array.from({ length: 12 }, (_, i) => {
-    const a = (i / 12) * Math.PI * 2 - Math.PI / 2;
-    return { x1: 16 + 11.5 * Math.cos(a), y1: 16 + 11.5 * Math.sin(a), x2: 16 + 14 * Math.cos(a), y2: 16 + 14 * Math.sin(a) };
+/** One cycle of a sine wave on its baseline, ending in a live dot. Same drawing as the app icon. */
+function sinePath(x0: number, x1: number, cy: number, amp: number): string {
+  const steps = 32;
+  const pts = Array.from({ length: steps + 1 }, (_, i) => {
+    const t = i / steps;
+    return `${(x0 + (x1 - x0) * t).toFixed(2)},${(cy - amp * Math.sin(t * Math.PI * 2)).toFixed(2)}`;
   });
-  const evening = (18 / 24) * Math.PI * 2 - Math.PI / 2;
+  return `M${pts[0]} L${pts.slice(1).join(' ')}`;
+}
+
+const MARK_PATH = sinePath(5, 25, 16, 7);
+
+export function LogoMark({ size = 28 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" className="logo-mark">
-      <circle cx="16" cy="16" r="8" className="logo-track" />
-      {ticks.map((t, i) => (
-        <line key={i} {...t} className="logo-tick" />
-      ))}
-      <path d={`M 16 8 A 8 8 0 1 1 ${16 + 8 * Math.cos(evening)} ${16 + 8 * Math.sin(evening)}`} className="logo-arc" />
-      <circle cx={16 + 8 * Math.cos(evening)} cy={16 + 8 * Math.sin(evening)} r="2.6" className="logo-dot" />
+      <line x1="3" y1="16" x2="28" y2="16" className="logo-base" />
+      <path d={MARK_PATH} className="logo-wave" />
+      <circle cx="25" cy="16" r="2.6" className="logo-dot" />
     </svg>
   );
 }
 
+/** "everybody Hz", letter-spaced, with the unit set apart. */
 export function Wordmark() {
+  const [word, unit] = brand.name.split(' ');
   return (
     <span className="wordmark">
       <LogoMark />
-      <span>{brand.name}</span>
+      <span className="wordmark-text">
+        {word}
+        <span className="wordmark-unit">{unit}</span>
+      </span>
     </span>
   );
 }

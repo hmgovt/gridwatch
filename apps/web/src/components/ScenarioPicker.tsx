@@ -9,7 +9,7 @@ export function ScenarioPicker({ open, onClose }: { open: boolean; onClose: () =
   return (
     <Sheet open={open} title="Preview a situation" onClose={onClose}>
       <p className="muted sheet-intro">
-        See how {IS_ARTIFACT ? 'the app' : 'Mainsight'} responds. One is a replay of a real notice; the others are hypothetical.
+        See how {IS_ARTIFACT ? 'the app' : 'everybody Hz'} responds. One is a replay of a real notice; the others are hypothetical.
       </p>
       <ul className="scenario-list">
         {SCENARIOS.map((s) => {

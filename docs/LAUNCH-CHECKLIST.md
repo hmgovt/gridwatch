@@ -4,7 +4,7 @@ To be useful for the tight days NESO expects in mid-to-late January, the nationa
 
 ## Product and data
 
-- [ ] Verify the Elexon adapters against live data ([DATA-SOURCES.md](DATA-SOURCES.md)) and replace the synthetic test fixtures with real ones.
+- [x] Verify the Elexon adapters against live data and replace the synthetic fixtures with real ones (29 September 2026, [DATA-SOURCES.md](DATA-SOURCES.md)).
 - [ ] Confirm the rota letter set and the rotation protocol details from the primary documents.
 - [ ] Decide how rotation schedules will reach us (feed, or operator entry with a two-person check) and rehearse it.
 - [ ] Have every user-facing sentence about notices checked by someone with grid operations experience.
@@ -13,7 +13,9 @@ To be useful for the tight days NESO expects in mid-to-late January, the nationa
 
 ## Name and brand
 
-- [ ] Clear the name: search the UKIPO trade mark register (classes 9 and 42), and check domains and app store names. The working name "Mainsight" passed a quick web search only.
+- [ ] Clear the name "everybody Hz": search the UKIPO trade mark register (classes 9 and 42), and check domains (everybodyhz.uk, .co.uk, .app) and app store names. A web search found no clash in energy or apps.
+- [ ] Get trade mark advice on the Hertz car rental marks. "Hz" is the SI unit and the pun is on "hurts", which helps, but Hertz is a well-known mark with extended protection.
+- [ ] Register the domain behind the app ID `uk.everybodyhz.app` (everybodyhz.uk).
 - [ ] Don't use "National Grid" or NESO branding. Keep the "not affiliated" line.
 
 ## Legal and compliance
@@ -37,5 +39,7 @@ To be useful for the tight days NESO expects in mid-to-late January, the nationa
 ## App stores (after the PWA)
 
 - [ ] Apple Developer and Google Play accounts.
-- [ ] Capacitor shells, and FCM and APNs push ([PORTING.md](PORTING.md)).
+- [x] Android shell with on-device checks and local notifications ([ANDROID.md](ANDROID.md)).
+- [ ] iOS shell, and FCM or APNs push from the server for faster alerts ([PORTING.md](PORTING.md)).
+- [ ] Test the Android build on a range of real phones, including battery saver and Doze, and measure how late background checks run.
 - [ ] Privacy labels and the data safety form.

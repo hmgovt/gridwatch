@@ -101,6 +101,8 @@ export interface StatusSnapshot {
   headroom: HeadroomPoint[];
   rotation: RotationSchedule | null;
   frequency: FrequencyReading | null;
+  /** The last few minutes of readings, oldest first, when available. */
+  frequencyTrace?: FrequencyReading[];
   sources: SourceHealth[];
   scenario?: ScenarioMeta;
 }

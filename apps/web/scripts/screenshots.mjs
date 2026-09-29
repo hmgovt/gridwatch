@@ -18,7 +18,7 @@ const shots = [
   { name: 'phone-now-rotation', path: '/?scenario=rotation', viewport: 'phone', scheme: 'light', letter: 'C' },
   { name: 'phone-now-off-dark', path: '/?scenario=rotation-live', viewport: 'phone', scheme: 'dark', letter: 'C' },
   { name: 'phone-now-hrdr-dark', path: '/?scenario=hrdr', viewport: 'phone', scheme: 'dark', full: true },
-  { name: 'phone-notice-detail', path: '/notices/emn-20260927T235700Z?scenario=emn-2026-09-28', viewport: 'phone', scheme: 'light', full: true },
+  { name: 'phone-notice-detail', path: '/notices/emn-20260927T232600Z?scenario=emn-2026-09-28', viewport: 'phone', scheme: 'light', full: true },
   { name: 'phone-learn', path: '/learn?scenario=calm', viewport: 'phone', scheme: 'light', full: true },
   { name: 'phone-settings-dark', path: '/settings?scenario=calm', viewport: 'phone', scheme: 'dark', full: true },
   { name: 'phone-onboarding', path: '/', viewport: 'phone', scheme: 'light', fresh: true },

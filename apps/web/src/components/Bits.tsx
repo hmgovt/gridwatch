@@ -44,7 +44,7 @@ export function SourcesNote() {
             <>
               {' '}
               <a href={snapshot.notices[0].source.url} target="_blank" rel="noopener noreferrer">
-                Read the report
+                View the source
               </a>
               .
             </>

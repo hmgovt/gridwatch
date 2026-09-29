@@ -1,13 +1,11 @@
 import { createHash } from 'node:crypto';
 import {
-  buildHeadroom,
-  buildNotices,
-  lastEvent,
-  noticeState,
-  parseWarning,
+  buildLiveSnapshot,
+  LIVE_SOURCES,
+  NOTICE_LOOKBACK_MS,
+  noticesFrom,
   sortNotices,
   type AlertEvent,
-  type ParsedWarning,
   type RotationSchedule,
   type StatusSnapshot,
 } from '@gridwatch/core';
@@ -20,13 +18,7 @@ import type { ElexonClient } from './sources/elexon.ts';
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 
-export const SOURCES = {
-  syswarn: { id: 'syswarn', label: 'NESO system warnings (Elexon BMRS)', critical: true },
-  lolpdrm: { id: 'lolpdrm', label: 'Loss of load probability and de-rated margin (Elexon BMRS)', critical: false },
-  freq: { id: 'freq', label: 'System frequency (Elexon BMRS)', critical: false },
-} as const;
-
-const NOTICE_SOURCE = { name: 'NESO system warnings via Elexon BMRS', url: 'https://bmrs.elexon.co.uk/' };
+export const SOURCES = LIVE_SOURCES;
 
 /** Events older than this when first seen are recorded but not pushed (e.g. on first start). */
 const ALERTABLE_AGE = 2 * HOUR;
@@ -77,7 +69,7 @@ export class Ingestor {
 
   /** Push alerts for notice changes we haven't handled yet. */
   async processNoticeEvents(now: Date): Promise<void> {
-    const notices = this.currentNotices(now, 7 * 24 * HOUR);
+    const notices = this.currentNotices(now, NOTICE_LOOKBACK_MS);
     for (const notice of notices) {
       for (const event of notice.history) {
         const key = `${notice.id}:${event.type}:${event.at}`;
@@ -104,32 +96,26 @@ export class Ingestor {
   }
 
   snapshot(now: Date = this.clock()): StatusSnapshot {
-    const notices = this.currentNotices(now, 7 * 24 * HOUR).filter((n) => {
-      if (noticeState(n, now) === 'active') return true;
-      const last = lastEvent(n);
-      return !!last && now.getTime() - new Date(last.at).getTime() < 48 * HOUR;
-    });
-    const frequency = this.store.latestFrequency();
-    const freshFrequency = frequency && now.getTime() - new Date(frequency.at).getTime() < 10 * MINUTE ? frequency : null;
-    return {
-      generatedAt: now.toISOString(),
-      mode: 'live',
-      notices: sortNotices(notices, now),
-      headroom: buildHeadroom(this.store.lolpBetween(new Date(now.getTime() - 30 * MINUTE), new Date(now.getTime() + 24 * HOUR))),
-      rotation: this.store.rotation(),
-      frequency: freshFrequency,
-      sources: this.store.sourceHealth().map((s) => {
-        const known = Object.values(SOURCES).find((k) => k.id === s.id);
-        return {
-          id: s.id,
-          label: s.label,
-          ok: s.ok,
-          critical: known?.critical ?? false,
-          ...(s.lastSuccessAt ? { lastSuccessAt: s.lastSuccessAt } : {}),
-          ...(s.lastAttemptAt ? { lastAttemptAt: s.lastAttemptAt } : {}),
-        };
-      }),
-    };
+    return buildLiveSnapshot(
+      {
+        warnings: this.store.warningsSince(new Date(now.getTime() - NOTICE_LOOKBACK_MS)),
+        lossOfLoad: this.store.lolpBetween(new Date(now.getTime() - 30 * MINUTE), new Date(now.getTime() + 24 * HOUR)),
+        frequency: this.store.frequencySince(new Date(now.getTime() - 10 * MINUTE)),
+        rotation: this.store.rotation(),
+        sources: this.store.sourceHealth().map((s) => {
+          const known = Object.values(SOURCES).find((k) => k.id === s.id);
+          return {
+            id: s.id,
+            label: s.label,
+            ok: s.ok,
+            critical: known?.critical ?? false,
+            ...(s.lastSuccessAt ? { lastSuccessAt: s.lastSuccessAt } : {}),
+            ...(s.lastAttemptAt ? { lastAttemptAt: s.lastAttemptAt } : {}),
+          };
+        }),
+      },
+      now,
+    );
   }
 
   notices(now: Date = this.clock(), days = 30) {
@@ -154,13 +140,7 @@ export class Ingestor {
   }
 
   private currentNotices(now: Date, lookbackMs: number) {
-    // Ignore anything stamped more than a few minutes in the future (bad data or clock skew).
-    const horizon = now.getTime() + 5 * MINUTE;
-    const parsed = this.store
-      .warningsSince(new Date(now.getTime() - lookbackMs))
-      .map(parseWarning)
-      .filter((w): w is ParsedWarning => w !== null && w.publishedAt.getTime() <= horizon);
-    return buildNotices(parsed, NOTICE_SOURCE);
+    return noticesFrom(this.store.warningsSince(new Date(now.getTime() - lookbackMs)), now, lookbackMs);
   }
 
   private async guard(source: { id: string; label: string }, task: () => Promise<void>): Promise<void> {

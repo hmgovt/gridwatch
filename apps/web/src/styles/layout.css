@@ -14,14 +14,14 @@
 }
 
 .skip-link:focus {
-  top: calc(env(safe-area-inset-top, 0px) + 8px);
+  top: calc(var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) + 8px);
 }
 
 /* ---- Top bar ------------------------------------------------------------ */
 
 .topbar {
   position: sticky;
-  top: env(safe-area-inset-top, 0px);
+  top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
   z-index: 20;
   display: flex;
   align-items: center;
@@ -43,36 +43,42 @@
 .wordmark {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
+}
+
+.wordmark-text {
   font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: 0.2em;
+  text-transform: lowercase;
+}
+
+/* The unit keeps its SI capital and stands a little apart, in the wave's colour. */
+.wordmark-unit {
+  margin-left: 0.45em;
   font-weight: 700;
-  font-size: 1.25rem;
-  letter-spacing: -0.03em;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: var(--accent);
 }
 
-.logo-track {
-  fill: none;
+.logo-base {
   stroke: var(--line-strong);
-  stroke-width: 3;
-}
-
-.logo-tick {
-  stroke: var(--ink-3);
-  stroke-width: 1.4;
+  stroke-width: 1.2;
   stroke-linecap: round;
 }
 
-.logo-arc {
+.logo-wave {
   fill: none;
   stroke: var(--accent);
-  stroke-width: 3;
+  stroke-width: 2.6;
   stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .logo-dot {
-  fill: var(--card);
-  stroke: var(--accent);
-  stroke-width: 2;
+  fill: var(--clear-mark);
 }
 
 .topnav {
@@ -134,7 +140,7 @@
   max-width: 1160px;
   margin: 0 auto;
   padding-inline: var(--gutter);
-  padding-block: 16px calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 28px);
+  padding-block: 16px calc(var(--tabbar-h) + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)) + 28px);
   outline: none;
 }
 
@@ -186,7 +192,7 @@
   z-index: 20;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+  padding: 6px 8px calc(6px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
   background: color-mix(in oklab, var(--card) 86%, transparent);
   backdrop-filter: saturate(1.4) blur(16px);
   -webkit-backdrop-filter: saturate(1.4) blur(16px);
@@ -259,6 +265,6 @@
 
   .now-hero {
     position: sticky;
-    top: calc(env(safe-area-inset-top, 0px) + 92px);
+    top: calc(var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) + 92px);
   }
 }

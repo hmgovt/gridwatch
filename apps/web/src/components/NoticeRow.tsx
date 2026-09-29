@@ -6,11 +6,21 @@ import {
   NOTICE_KINDS,
   noticeState,
   type Notice,
+  type NoticeKind,
 } from '@gridwatch/core';
 import { Link } from '../router.tsx';
 import { Icon } from './Icon.tsx';
 
 const STATE_LABEL = { active: 'In force', cancelled: 'Cancelled', ended: 'Ended' } as const;
+
+/** What a cancellation means, by kind. Only claims what the cancellation itself tells us. */
+const STOOD_DOWN: Record<NoticeKind, string> = {
+  EMN: 'Margins recovered. No action was needed.',
+  CMN: 'The forecast improved. No action was needed.',
+  HRDR: 'Stood down. No demand reduction was needed.',
+  DCI: 'Stood down.',
+  DCRP: 'The rotation has been stood down.',
+};
 
 export function NoticeRow({ notice, now }: { notice: Notice; now: Date }) {
   const info = NOTICE_KINDS[notice.kind];
@@ -50,7 +60,7 @@ export function NoticeTimeline({ notice }: { notice: Notice }) {
                 Stated shortfall <strong className="tabular">{event.shortfallMW.toLocaleString('en-GB')} MW</strong>
               </span>
             )}
-            {event.type === 'cancelled' && <span className="timeline-detail">Enough capacity was found. No action was needed.</span>}
+            {event.type === 'cancelled' && <span className="timeline-detail">{STOOD_DOWN[notice.kind]}</span>}
             {event.sourceText && (
               <details className="timeline-source">
                 <summary>Official wording</summary>

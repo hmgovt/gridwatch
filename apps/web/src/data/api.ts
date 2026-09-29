@@ -23,7 +23,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
       headers: { accept: 'application/json', ...(init.body ? { 'content-type': 'application/json' } : {}), ...init.headers },
     });
   } catch {
-    throw new ApiError(0, 'Can’t reach the Mainsight service. Check your connection.');
+    throw new ApiError(0, 'Can’t reach the everybody Hz service. Check your connection.');
   }
   if (response.status === 204) return undefined as T;
   const body = (await response.json().catch(() => ({}))) as { error?: string };

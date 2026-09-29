@@ -1,6 +1,6 @@
 # Privacy design
 
-Mainsight is built to work without knowing who or where its users are. This page is the engineering record of what we collect, why, and for how long. It feeds the public privacy notice and the data protection impact assessment, but it is **not legal advice**; have both reviewed before launch.
+everybody Hz is built to work without knowing who or where its users are. This page is the engineering record of what we collect, why, and for how long. It feeds the public privacy notice and the data protection impact assessment, but it is **not legal advice**; have both reviewed before launch.
 
 ## Data inventory
 
@@ -19,6 +19,10 @@ Mainsight is built to work without knowing who or where its users are. This page
 **Postcodes:** the app does not ask for one yet. When local fault forecasts arrive, only the outward code (such as `SW1A`, covering thousands of homes) will be used. The core library already reduces any full postcode on the device (`toOutwardCode`).
 
 **Health information:** we deliberately never ask whether someone relies on medical equipment, because that is special category data. The app tells people to contact 105 or their supplier's Priority Services Register instead.
+
+## The Android app
+
+The Android app has no server of ours at all. It sends anonymous requests for public data to Elexon (`data.elexon.co.uk`), which sees the phone's IP address as any website would, and nothing else leaves the device. The rota letter, alert level and cached status stay in the app's private storage, which is excluded from cloud backup and device transfer. Background checks run on the phone. The Play Store data safety answer is "no data collected or shared".
 
 ## Request logs and IP addresses
 

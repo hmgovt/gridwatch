@@ -37,6 +37,10 @@ flowchart LR
   DB --> HTTP -->|same JSON for everyone,<br/>cacheable| CORE2 --> UI
 ```
 
+### The Android app: the same pipeline on the phone
+
+The Android app skips our server. `apps/web/src/data/direct.ts` fetches the same three Elexon feeds and calls `buildLiveSnapshot` from `@gridwatch/core`, the function the server's `/v1/status` uses, so both produce identical status documents. Background alerts come from a WorkManager job on the phone ([ANDROID.md](ANDROID.md)).
+
 ### Why it's shaped like this
 
 - **One status document for everyone.** `/v1/status` is identical for every user, so it can sit behind a CDN, and it reveals nothing about who asked. Each device applies its own rota letter on the device (`assessPersonal` in `@gridwatch/core`).

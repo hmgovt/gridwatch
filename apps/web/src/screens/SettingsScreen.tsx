@@ -100,7 +100,8 @@ function AlertsCard() {
   const toast = useToast();
 
   const blocked = alerts.support !== 'supported';
-  const permissionDenied = !blocked && typeof Notification !== 'undefined' && Notification.permission === 'denied';
+  const permissionDenied =
+    alerts.kind === 'server' && !blocked && typeof Notification !== 'undefined' && Notification.permission === 'denied';
 
   return (
     <section className="card" aria-labelledby="alerts-title">
@@ -179,6 +180,12 @@ function AlertsCard() {
             {alerts.error}
           </p>
         )}
+        {alerts.kind === 'device' && (
+          <p className="muted small-note">
+            Your phone checks NESO’s warnings about every 15 minutes, even with the app closed. Android sometimes waits longer to save
+            battery, so treat an alert as a prompt, not a guarantee.
+          </p>
+        )}
       </div>
     </section>
   );
@@ -205,14 +212,25 @@ function PrivacyCard() {
             <li>The last grid status, for offline use</li>
           </ul>
         </div>
-        <div>
-          <h3 className="eyebrow">On our server, only with alerts on</h3>
-          <ul>
-            <li>A random push address from your browser</li>
-            <li>Your rota letter and alert choice</li>
-            <li>When the app was last opened (deleted after 6 months unused)</li>
-          </ul>
-        </div>
+        {alerts.kind === 'device' ? (
+          <div>
+            <h3 className="eyebrow">Sent from this phone</h3>
+            <ul>
+              <li>Anonymous requests for Elexon’s public grid data, and nothing else</li>
+              <li>Elexon sees your IP address, as any website would</li>
+              <li>No server of ours is involved: alerts are checked on the phone</li>
+            </ul>
+          </div>
+        ) : (
+          <div>
+            <h3 className="eyebrow">On our server, only with alerts on</h3>
+            <ul>
+              <li>A random push address from your browser</li>
+              <li>Your rota letter and alert choice</li>
+              <li>When the app was last opened (deleted after 6 months unused)</li>
+            </ul>
+          </div>
+        )}
         <div>
           <h3 className="eyebrow">Never collected</h3>
           <ul>
@@ -226,7 +244,8 @@ function PrivacyCard() {
       {confirming ? (
         <div className="confirm">
           <p>
-            Delete your settings from this device{registration ? ' and your alert registration from our server' : ''}? This can’t be undone.
+            Delete your settings from this device{registration && alerts.kind === 'server' ? ' and your alert registration from our server' : ''}? This
+            can’t be undone.
           </p>
           <div className="button-row">
             <button

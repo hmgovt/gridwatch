@@ -2,6 +2,7 @@ import { activeNotices, NATIONAL_LEVELS, sortNotices, type NationalLevel } from 
 import { Callout105, ScenarioBanner, SourcesNote } from '../components/Bits.tsx';
 import { FrequencyGauge } from '../components/FrequencyGauge.tsx';
 import { HeadroomChart } from '../components/HeadroomChart.tsx';
+import { HzWave } from '../components/HzWave.tsx';
 import { Icon } from '../components/Icon.tsx';
 import { LevelMeter } from '../components/LevelMeter.tsx';
 import { NoticeRow } from '../components/NoticeRow.tsx';
@@ -36,6 +37,7 @@ export function NowScreen() {
         <ScenarioBanner />
         <StatusRing snapshot={snapshot} status={status} now={now} letter={prefs.rotaLetter} />
         <RingLegend snapshot={snapshot} status={status} now={now} letter={prefs.rotaLetter} />
+        <HzWave hz={snapshot.frequency?.hz ?? null} level={status.level} label={mode === 'scenario' ? 'Grid frequency · scenario' : 'Grid frequency · live'} />
         <StatusSummary status={status} />
       </div>
 
@@ -73,7 +75,7 @@ export function NowScreen() {
               <h2 id="headroom-title">Spare capacity, next 12 hours</h2>
               <p className="card-sub">NESO’s forecast of power available above expected demand, after reserves.</p>
             </div>
-            {mode === 'scenario' && <span className="chip">Illustrative</span>}
+            {mode === 'scenario' && snapshot.scenario?.hypothetical !== false && <span className="chip">Illustrative</span>}
           </div>
           <HeadroomChart points={snapshot.headroom} now={now} />
         </section>
@@ -86,8 +88,8 @@ export function NowScreen() {
             </div>
             <FrequencyGauge reading={snapshot.frequency} />
             <p className="card-note muted">
-              The grid runs at 50 Hz. It dips when demand outruns supply, and NESO keeps it between 49.8 and 50.2 Hz. It shows the system
-              is coping; it can’t predict a cut.
+              Every generator on the grid turns in step, 50 times a second. Frequency dips when demand outruns supply, and NESO holds it
+              between 49.8 and 50.2 Hz. It tells you the system is coping now, not whether a cut is coming.
             </p>
           </section>
         )}
@@ -109,7 +111,7 @@ function LiveUnavailable() {
       <p className="muted">
         {loading
           ? 'Fetching the latest notices and forecasts.'
-          : (error ?? 'The Mainsight service didn’t respond.') + ' If your power is off, call 105 to report it or get an update.'}
+          : (error ?? 'The everybody Hz service didn’t respond.') + ' If your power is off, call 105 to report it or get an update.'}
       </p>
       <div className="unavailable-actions">
         <button type="button" className="btn btn-primary" onClick={refresh} disabled={loading}>

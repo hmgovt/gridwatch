@@ -37,7 +37,8 @@ export function HeadroomChart({ points, now, hours = 12 }: { points: HeadroomPoi
   const values = series.map((p) => p.deratedMarginMW);
   const maxV = Math.max(...values);
   const minV = Math.min(...values);
-  const step = maxV > 6000 ? 2000 : 1000;
+  // At most six gridlines, whatever the scale.
+  const step = [500, 1000, 2000, 5000, 10_000].find((st) => (maxV * 1.08 - Math.min(0, minV)) / st <= 6) ?? 10_000;
   const yMax = Math.max(step * 2, Math.ceil((maxV * 1.08) / step) * step);
   const yMin = Math.min(0, Math.floor(minV / step) * step);
   const plotW = Math.max(120, width - M.left - M.right);
@@ -115,13 +116,13 @@ export function HeadroomChart({ points, now, hours = 12 }: { points: HeadroomPoi
             <g className="chart-min">
               <circle cx={x(mid(tightest))} cy={y(tightest.deratedMarginMW)} r={5} />
               {(() => {
-                // The lowest point sits in a dip, so the space above it is clear of the line.
+                // The lowest point sits in a dip: the shaded area below it is clear of the line.
                 const py = y(tightest.deratedMarginMW);
-                const above = py - M.top > 30;
+                const below = HEIGHT - M.bottom - py > 34;
                 return (
                   <text
                     x={Math.min(Math.max(x(mid(tightest)), M.left + 56), width - M.right - 56)}
-                    y={above ? py - 14 : py + 22}
+                    y={below ? py + 24 : py - 14}
                     textAnchor="middle"
                     className="chart-min-label"
                   >

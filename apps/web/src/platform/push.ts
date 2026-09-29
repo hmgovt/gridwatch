@@ -1,7 +1,7 @@
 /**
- * Push notifications. On the web this is the Push API through our service
- * worker; in the native shells it becomes APNs/FCM via Capacitor. Callers only
- * see this interface.
+ * Web Push through our service worker, used by the website's alerts
+ * (`serverAlerts` in alerts.ts). The native app raises its own notifications
+ * instead (`deviceAlerts`).
  */
 export interface PushSubscriptionData {
   endpoint: string;
@@ -66,11 +66,4 @@ export const webPush: PushPlatform = {
     const subscription = await registration?.pushManager.getSubscription();
     await subscription?.unsubscribe();
   },
-};
-
-export const noPush: PushPlatform = {
-  support: () => 'unsupported',
-  permission: () => 'unsupported',
-  subscribe: () => Promise.reject(new Error('Alerts are not available in this preview')),
-  unsubscribe: () => Promise.resolve(),
 };

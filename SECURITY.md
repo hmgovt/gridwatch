@@ -6,7 +6,7 @@ Please report security issues privately to **security@TODO-your-domain** (set th
 
 ## How the system is protected
 
-Mainsight is a safety-adjacent alert service, so the design keeps the attack surface small and assumes every input is hostile.
+everybody Hz is a safety-adjacent alert service, so the design keeps the attack surface small and assumes every input is hostile.
 
 ### Data we hold
 

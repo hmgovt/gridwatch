@@ -106,7 +106,8 @@ export interface ParsedWarning {
   text: string;
 }
 
-const KIND_PATTERNS: ReadonlyArray<[NoticeKind, RegExp]> = [
+/** Most serious first. Mirrored in the Android background check (WarningClassifier.java). */
+export const KIND_PATTERNS: ReadonlyArray<[NoticeKind, RegExp]> = [
   ['DCRP', /DEMAND CONTROL ROTATION|\bDCRP\b|ROTA(?:TIONAL)?\s+(?:LOAD\s+)?DISCONNECTION/],
   ['DCI', /DEMAND CONTROL IMMINENT|\bDCI\b/],
   ['HRDR', /HIGH RISK OF DEMAND (?:REDUCTION|CONTROL)|\bHRDR\b/],
@@ -114,7 +115,7 @@ const KIND_PATTERNS: ReadonlyArray<[NoticeKind, RegExp]> = [
   ['EMN', /ELECTRICITY MARGIN NOTICE|\bEMN\b|INADEQUATE SYSTEM MARGIN|\bNISM\b/],
 ];
 
-const CANCELLATION = /(?<!(?:MAY|WILL|COULD|MIGHT) BE )\b(?:CANCELL?ED|CANCELL?ATION|WITHDRAWN|NO LONGER (?:IN FORCE|APPLIES|APPLICABLE))\b/;
+export const CANCELLATION = /(?<!(?:MAY|WILL|COULD|MIGHT) BE )\b(?:CANCELL?ED|CANCELL?ATION|WITHDRAWN|NO LONGER (?:IN FORCE|APPLIES|APPLICABLE))\b/;
 
 const MONTHS = [
   'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
@@ -148,10 +149,25 @@ export function parseWarning(raw: RawSystemWarning): ParsedWarning | null {
   return parsed;
 }
 
-/** Strip control characters and collapse whitespace. Output is plain text. */
+/**
+ * Plain text with the message's line structure kept. The live feed mixes real
+ * line breaks with literal "\n" sequences, so both become newlines; control
+ * characters go, runs of spaces and blank lines collapse.
+ */
 export function sanitiseText(input: string): string {
-  // eslint-disable-next-line no-control-regex
-  return input.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '').replace(/\s+/g, ' ').trim().slice(0, 2000);
+  return (
+    input
+      .replace(/\\r\\n|\\n|\\r/g, '\n')
+      .replace(/\r\n?/g, '\n')
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '')
+      .split('\n')
+      .map((line) => line.replace(/[ \t ]+/g, ' ').trim())
+      .join('\n')
+      .replace(/\n{2,}/g, '\n')
+      .trim()
+      .slice(0, 4000)
+  );
 }
 
 export function parseShortfall(text: string): number | undefined {

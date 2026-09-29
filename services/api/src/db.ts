@@ -189,6 +189,12 @@ export class Store {
     return row ? { at: String(row.at), hz: Number(row.hz) } : null;
   }
 
+  /** Readings since a moment, oldest first. */
+  frequencySince(since: Date): Array<{ at: string; hz: number }> {
+    const rows = this.db.prepare('SELECT at, hz FROM frequency WHERE at >= ? ORDER BY at').all(since.toISOString()) as Row[];
+    return rows.map((r) => ({ at: String(r.at), hz: Number(r.hz) }));
+  }
+
   // --- source health -----------------------------------------------------
 
   recordAttempt(id: string, label: string, at: Date, error: string | null): void {

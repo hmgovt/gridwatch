@@ -1,5 +1,7 @@
 # Porting to iOS and Android
 
+**Android is done**: see [ANDROID.md](ANDROID.md). It uses on-device checks and local notifications instead of server push. The steps below still apply to iOS, and to adding server push (FCM) to Android later.
+
 The web app is built so that the native apps are the same code in a native shell (Capacitor), with a few platform services swapped. This page lists every swap.
 
 ## What is already in place
@@ -16,7 +18,7 @@ The web app is built so that the native apps are the same code in a native shell
 cd apps/web
 pnpm add @capacitor/core @capacitor/preferences @capacitor/push-notifications @capacitor/haptics
 pnpm add -D @capacitor/cli
-npx cap init Mainsight uk.co.example.mainsight --web-dir dist
+npx cap add ios   # the Capacitor config (apps/web/capacitor.config.ts) already exists
 VITE_API_BASE=https://api.example.org pnpm build
 npx cap add ios && npx cap add android
 npx cap sync

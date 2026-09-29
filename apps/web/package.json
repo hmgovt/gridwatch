@@ -8,10 +8,16 @@
     "build": "vite build",
     "build:artifact": "vite build --mode artifact && node scripts/inline-artifact.mjs",
     "serve": "vite preview",
+    "build:native": "vite build --mode native && cap sync android",
+    "android:apk": "pnpm build:native && cd android && ./gradlew assembleRelease testReleaseUnitTest",
+    "icons": "node scripts/render-icons.mjs",
     "typecheck": "tsc -p .",
     "test": "vitest run"
   },
   "dependencies": {
+    "@capacitor/android": "8.5.2",
+    "@capacitor/app": "8.1.1",
+    "@capacitor/core": "8.5.2",
     "@fontsource-variable/bricolage-grotesque": "5.3.0",
     "@fontsource-variable/instrument-sans": "5.3.0",
     "@fontsource/ibm-plex-mono": "5.3.0",
@@ -21,6 +27,7 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.5.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.1",

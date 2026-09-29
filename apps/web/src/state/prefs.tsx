@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { isRotaLetter, SCENARIOS, type RotaLetter, type Sensitivity } from '@gridwatch/core';
+import type { AlertRegistration } from '../platform/alerts.ts';
 import { IS_ARTIFACT, platform } from '../platform/index.ts';
 
 export type ThemeChoice = 'system' | 'light' | 'dark';
@@ -11,11 +12,6 @@ export interface Prefs {
   onboarded: boolean;
   dataMode: 'live' | 'scenario';
   scenarioId: string;
-}
-
-export interface AlertRegistration {
-  id: string;
-  token: string;
 }
 
 const PREFS_KEY = 'prefs.v1';

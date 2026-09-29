@@ -19,14 +19,14 @@ const js = readFileSync(join(dist, scriptSrc), 'utf8').replace(/<\/script/gi, '<
 const css = readFileSync(join(dist, styleHref), 'utf8');
 if (/url\((?!["']?data:)/.test(css)) throw new Error('Stylesheet still references external files');
 
-const page = `<title>Mainsight</title>
+const page = `<title>everybody Hz</title>
 <style>${css}</style>
 <div id="root"></div>
-<noscript>Mainsight needs JavaScript. If your power is off, call 105.</noscript>
+<noscript>everybody Hz needs JavaScript. If your power is off, call 105.</noscript>
 <script type="module">${js}</script>
 `;
 
 mkdirSync(join(root, 'artifact'), { recursive: true });
-const out = join(root, 'artifact', 'mainsight.html');
+const out = join(root, 'artifact', 'everybody-hz.html');
 writeFileSync(out, page);
 console.log(`wrote ${out} (${(page.length / 1024).toFixed(0)} KB)`);

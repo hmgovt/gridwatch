@@ -1,12 +1,14 @@
 import { addDaysToKey, atUkTime, durations, ukDayKey } from './time.ts';
 import type { HeadroomPoint, Notice, NoticeEvent, NoticeKind, RotationSchedule, StatusSnapshot } from './types.ts';
+import { noticesFrom } from './live.ts';
 import { noticeId } from './notices.ts';
+import { EMN_28_SEP_HEADROOM, EMN_28_SEP_WARNINGS } from './replay-2026-09-28.ts';
 
 /**
  * Scenario snapshots for previews, demos, design reviews and tests. They use
  * exactly the same shape as live data, and are always labelled in the UI.
- * One scenario replays a real event from public reporting; the rest are
- * hypothetical and say so.
+ * One scenario replays a real event from NESO's published messages; the rest
+ * are hypothetical and say so.
  */
 
 export interface ScenarioDefinition {
@@ -14,9 +16,6 @@ export interface ScenarioDefinition {
   label: string;
   build(today: string): StatusSnapshot;
 }
-
-const NCE_28_SEP =
-  'https://www.newcivilengineer.com/latest/neso-issues-electricity-margin-notice-for-gb-grid-before-later-cancelling-it-28-09-2026/';
 
 export const SCENARIOS: ScenarioDefinition[] = [
   { id: 'calm', label: 'Calm evening', build: calm },
@@ -49,48 +48,41 @@ function calm(today: string): StatusSnapshot {
   });
 }
 
+/** 13:20 BST on 28 September 2026: after NESO's midday update, before the cancellation. */
+const REPLAY_AT = new Date('2026-09-28T12:20:00Z');
+
 function marginNotice28Sep(): StatusSnapshot {
-  const day = '2026-09-28';
-  const at = atUkTime(day, '13:20');
-  const window = { start: atUkTime(day, '16:00').toISOString(), end: atUkTime(day, '19:00').toISOString() };
-  const source = { name: 'NESO, as reported by New Civil Engineer', url: NCE_28_SEP };
-  const issued = atUkTime(day, '00:57');
-  const emn: Notice = {
-    id: noticeId('EMN', issued),
-    kind: 'EMN',
-    window,
-    shortfallMW: 104,
-    cancelled: false,
-    source,
-    history: [
-      { type: 'issued', at: issued.toISOString(), window, shortfallMW: 1400 },
-      { type: 'updated', at: atUkTime(day, '12:42').toISOString(), window, shortfallMW: 104 },
-    ],
-  };
+  const known = EMN_28_SEP_WARNINGS.filter((w) => w.publishTime <= REPLAY_AT.toISOString());
   return snapshot({
-    at,
+    at: REPLAY_AT,
     id: 'emn-2026-09-28',
     title: 'Margin notice, 28 Sep 2026',
     description:
-      'Replay of a real Electricity Margin Notice, shown at 13:20 after the update. NESO cancelled it at 15:58. Headroom figures are illustrative.',
+      'Replay of a real Electricity Margin Notice, shown at 13:20 after NESO’s midday update. NESO cancelled it at 15:00. The forecast is the one published at the time.',
     hypothetical: false,
-    sourceNote: 'Times and shortfalls from NESO statements reported by New Civil Engineer.',
-    notices: [emn],
-    headroom: curve(day, '13:00', 22, [
-      ['13:00', 3300], ['15:00', 2400], ['16:00', 1500], ['17:00', 1150], ['17:30', 1050], ['18:00', 1100], ['18:30', 1300], ['19:00', 1700], ['20:00', 2600], ['21:00', 3300], ['22:00', 3900], ['23:30', 4300],
-    ]),
-    hz: 49.97,
+    sourceNote: 'NESO’s messages and forecast as published on Elexon BMRS.',
+    notices: noticesFrom(known, REPLAY_AT),
+    headroom: EMN_28_SEP_HEADROOM.map(([start, mw, horizon]) => ({
+      start: new Date(start).toISOString(),
+      settlementPeriod: settlementPeriodOf(new Date(start)),
+      deratedMarginMW: mw,
+      lossOfLoadProbability: 0,
+      horizonHours: horizon,
+    })),
+    // Measured at 12:20:00 UTC that day.
+    hz: 49.974,
   });
 }
 
-/** Shows the moment NESO cancelled the 28 Sep notice, for the lifecycle view. */
+/** The same notice after NESO cancelled it, for the lifecycle view and tests. */
 export function marginNotice28SepCancelled(): Notice {
-  const base = marginNotice28Sep().notices[0]!;
-  return {
-    ...base,
-    cancelled: true,
-    history: [...base.history, { type: 'cancelled', at: atUkTime('2026-09-28', '15:58').toISOString() }],
-  };
+  return noticesFrom(EMN_28_SEP_WARNINGS, new Date('2026-09-28T16:00:00Z'))[0]!;
+}
+
+/** Half-hour settlement period of a UK day (ignores the 46/50-period clock-change days). */
+function settlementPeriodOf(start: Date): number {
+  const midnight = atUkTime(ukDayKey(start), '00:00').getTime();
+  return Math.floor((start.getTime() - midnight) / (30 * durations.MINUTE)) + 1;
 }
 
 function highRisk(today: string): StatusSnapshot {

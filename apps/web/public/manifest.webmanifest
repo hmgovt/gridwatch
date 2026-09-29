@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Mainsight",
-  "short_name": "Mainsight",
-  "description": "Plain-English early warning of power disruption in Great Britain.",
+  "name": "everybody Hz",
+  "short_name": "everybody Hz",
+  "description": "Early warning of power cuts in Great Britain, in plain English.",
   "lang": "en-GB",
   "start_url": "/",
   "scope": "/",

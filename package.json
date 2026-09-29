@@ -18,6 +18,7 @@
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "build:artifact": "pnpm --filter @gridwatch/web build:artifact",
     "icons": "node apps/web/scripts/render-icons.mjs",
+    "android:apk": "pnpm --filter @gridwatch/web android:apk",
     "screenshots": "node apps/web/scripts/screenshots.mjs"
   },
   "devDependencies": {

@@ -12,8 +12,8 @@ import { usePrefs } from '../state/prefs.tsx';
 import { useUi } from '../state/ui.tsx';
 
 const PROMISES: Array<{ icon: IconName; title: string; text: string }> = [
-  { icon: 'clear', title: 'Plain English', text: 'What each official grid warning means for your home, and what to do.' },
-  { icon: 'off', title: 'Your block, your times', text: 'Exact times if rotating power cuts are planned for your rota letter.' },
+  { icon: 'clear', title: 'Straight from the source', text: 'NESO’s own warnings and forecasts, explained. Nothing invented, nothing sensational.' },
+  { icon: 'off', title: 'Your rota letter, ready', text: 'If rotating power cuts are ever announced, your block is the one that matters.' },
   { icon: 'lock', title: 'Private by design', text: 'No account, no location, no tracking. Your settings stay on this device.' },
 ];
 
@@ -76,11 +76,11 @@ export function Onboarding() {
           >
             {step === 0 && (
               <>
-                <WelcomeRing />
+                <WelcomeMark />
                 <h1 className="onboarding-title">{brand.tagline}</h1>
                 <p className="muted onboarding-lede">
-                  {brand.name} turns the grid operator’s official warnings into a clear answer for your home: all clear, heads-up, get
-                  ready or power off.
+                  {brand.name} reads NESO’s official warnings as they’re published and tells you what they mean for your home: all
+                  clear, heads-up, get ready or power off.
                 </p>
                 <ul className="promises">
                   {PROMISES.map((p, i) => (
@@ -100,7 +100,7 @@ export function Onboarding() {
                     Get started
                   </button>
                   <button type="button" className="btn btn-quiet" onClick={finish}>
-                    Just look around
+                    Look around first
                   </button>
                 </div>
               </>
@@ -130,7 +130,7 @@ export function Onboarding() {
               <>
                 <span className="eyebrow">Step 2 of 2</span>
                 <h1 className="onboarding-title">When should we tell you?</h1>
-                <p className="muted onboarding-lede">We’ll never push routine notices unless you ask. You can change this any time.</p>
+                <p className="muted onboarding-lede">Routine notices stay in the app unless you ask for them. You can change this any time.</p>
                 <Segmented<Sensitivity>
                   label="Alert level"
                   stacked
@@ -185,32 +185,32 @@ export function Onboarding() {
   );
 }
 
-function WelcomeRing() {
-  const C = 90;
-  const polar = (r: number, m: number) => {
-    const a = (m / 1440) * Math.PI * 2 - Math.PI / 2;
-    return [C + r * Math.cos(a), C + r * Math.sin(a)] as const;
-  };
-  const end = polar(62, 18 * 60);
+/** The mark drawing itself: one cycle at 50 Hz, then the live dot. */
+function WelcomeMark() {
+  const steps = 64;
+  const d = Array.from({ length: steps + 1 }, (_, i) => {
+    const t = i / steps;
+    return `${i === 0 ? 'M' : 'L'}${(24 + 192 * t).toFixed(1)},${(60 - 36 * Math.sin(t * Math.PI * 2)).toFixed(1)}`;
+  }).join(' ');
+  const [word, unit] = brand.name.split(' ');
   return (
-    <div className="welcome-ring lvl-clear" aria-hidden="true">
+    <div className="welcome-mark lvl-clear" aria-hidden="true">
       <div className="ring-glow" />
-      <svg viewBox="0 0 180 180">
-        {Array.from({ length: 48 }, (_, i) => {
-          const [x0, y0] = polar(i % 12 === 0 ? 76 : 80, i * 30);
-          const [x1, y1] = polar(85, i * 30);
-          return <line key={i} x1={x0} y1={y0} x2={x1} y2={y1} className={i % 12 === 0 ? 'tick tick-major' : 'tick'} style={{ ['--i' as string]: i }} />;
-        })}
-        <circle cx={C} cy={C} r={62} className="ring-track" style={{ strokeWidth: 8 }} />
+      <svg viewBox="0 0 240 120">
+        <motion.line x1={10} y1={60} x2={230} y2={60} className="welcome-base" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.6 }} />
         <motion.path
-          d={`M ${C} ${C - 62} A 62 62 0 1 1 ${end[0]} ${end[1]}`}
-          className="welcome-arc"
+          d={d}
+          className="welcome-wave"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
-          transition={{ duration: 1.6, ease: [0.2, 0.8, 0.2, 1], delay: 0.2 }}
+          transition={{ duration: 1.4, ease: [0.65, 0, 0.35, 1], delay: 0.2 }}
         />
-        <motion.circle cx={end[0]} cy={end[1]} r={6} className="now-dot" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1.6, type: 'spring', stiffness: 400, damping: 16 }} />
+        <motion.circle cx={216} cy={60} r={7} className="welcome-dot" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1.5, type: 'spring', stiffness: 400, damping: 16 }} />
       </svg>
+      <motion.p className="welcome-word" initial={{ opacity: 0, letterSpacing: '0.1em' }} animate={{ opacity: 1, letterSpacing: '0.32em' }} transition={{ delay: 0.5, duration: 1.2, ease: [0.2, 0.8, 0.2, 1] }}>
+        {word}
+        <span className="wordmark-unit">{unit}</span>
+      </motion.p>
     </div>
   );
 }

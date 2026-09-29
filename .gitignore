@@ -14,10 +14,14 @@ services/api/data/
 .env.*
 !.env.example
 
-# Native shells, once added with Capacitor
-apps/web/ios/
-apps/web/android/
+# Native build output (the Android project itself is committed)
+apps/web/android/app/build/
+apps/web/android/build/
+apps/web/android/.gradle/
+apps/web/android/local.properties
+apps/web/android/app/src/main/assets/public/
 
 # Preview build output
 apps/web/dist-artifact/
+apps/web/dist-native/
 apps/web/artifact/

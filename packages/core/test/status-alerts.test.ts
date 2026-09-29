@@ -19,7 +19,7 @@ describe('personal status', () => {
     const s = buildScenario('emn-2026-09-28', realNow);
     const status = assessPersonal(s, { rotaLetter: 'C' }, at(s));
     expect(status.level).toBe('clear');
-    expect(status.headline).toBe('All clear for you');
+    expect(status.headline).toBe('A routine grid notice');
     expect(status.national).toBe(1);
     expect(status.focusWindow?.label).toBe('Grid notice');
   });

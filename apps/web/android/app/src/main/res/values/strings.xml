@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">everybody Hz</string>
+    <string name="title_activity_main">everybody Hz</string>
+    <string name="package_name">uk.everybodyhz.app</string>
+    <string name="custom_url_scheme">uk.everybodyhz.app</string>
+</resources>

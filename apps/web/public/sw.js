@@ -1,5 +1,5 @@
 /*
- * Mainsight service worker: offline app shell and push notifications.
+ * everybody Hz service worker: offline app shell and push notifications.
  * Kept small and dependency-free so it can be audited at a glance.
  */
 const VERSION = 'v1';
@@ -70,7 +70,7 @@ self.addEventListener('push', (event) => {
   } catch {
     data = {};
   }
-  const title = typeof data.title === 'string' ? data.title.slice(0, 80) : 'Mainsight';
+  const title = typeof data.title === 'string' ? data.title.slice(0, 80) : 'everybody Hz';
   const options = {
     body: typeof data.body === 'string' ? data.body.slice(0, 200) : 'Open the app for the latest status.',
     tag: typeof data.tag === 'string' ? data.tag.slice(0, 64) : undefined,

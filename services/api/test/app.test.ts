@@ -15,7 +15,7 @@ function fakeFetch(): typeof fetch {
     const body = url.pathname.endsWith('/datasets/SYSWARN')
       ? publishedBefore(fixture('syswarn-2026-09-28.json'), url.searchParams.get('publishDateTimeTo'))
       : url.pathname.endsWith('/loss-of-load')
-        ? fixture('lolpdrm.json')
+        ? forecastsKnownAt(fixture('lolpdrm.json'), url.searchParams.get('from'))
         : JSON.stringify({ data: [{ measurementTime: url.searchParams.get('to'), frequency: 49.97 }] });
     return new Response(body, { status: 200, headers: { 'content-type': 'application/json' } });
   }) as typeof fetch;
@@ -26,6 +26,14 @@ function publishedBefore(body: string, to: string | null): string {
   const parsed = JSON.parse(body) as { data: Array<{ publishTime: string }> };
   if (!to) return body;
   return JSON.stringify({ data: parsed.data.filter((r) => r.publishTime <= to) });
+}
+
+/** The ingestor asks from an hour before "now"; drop forecasts that weren't published yet at that "now". */
+function forecastsKnownAt(body: string, from: string | null): string {
+  const parsed = JSON.parse(body) as { data: Array<{ publishTime: string }> };
+  if (!from) return body;
+  const now = new Date(new Date(from).getTime() + 3600_000).toISOString();
+  return JSON.stringify({ data: parsed.data.filter((r) => r.publishTime <= now) });
 }
 
 class RecordingSender implements PushSender {
@@ -102,7 +110,13 @@ describe('status', () => {
     expect(body.mode).toBe('live');
     expect(body.notices).toHaveLength(1);
     expect(body.notices[0]?.history.map((e) => e.type)).toEqual(['issued', 'updated', 'cancelled']);
-    expect(body.headroom.map((p) => p.deratedMarginMW)).toEqual([1521, 1050]);
+    // Real forecast for 28 September 2026: the latest published figure for each half-hour.
+    expect(body.headroom.slice(0, 4).map((p) => [p.start, p.deratedMarginMW, p.horizonHours])).toEqual([
+      ['2026-09-28T15:00:00.000Z', 11585, 1],
+      ['2026-09-28T15:30:00.000Z', 10654, 1],
+      ['2026-09-28T16:00:00.000Z', 8598, 1],
+      ['2026-09-28T16:30:00.000Z', 6912, 2],
+    ]);
     expect(body.frequency?.hz).toBe(49.97);
     expect(body.sources.find((s) => s.id === 'syswarn')).toMatchObject({ ok: true, critical: true });
   });

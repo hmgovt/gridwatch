@@ -1,8 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { assessPersonal, buildScenario, type PersonalStatus, type StatusSnapshot } from '@gridwatch/core';
-import { platform } from '../platform/index.ts';
+import { DATA_SOURCE, platform } from '../platform/index.ts';
 import { usePrefs } from '../state/prefs.tsx';
 import { api, ApiError } from './api.ts';
+import { fetchDirectSnapshot } from './direct.ts';
+
+/** Our API, or Elexon straight from the device (native app). */
+const fetchSnapshot = DATA_SOURCE === 'direct' ? () => fetchDirectSnapshot() : () => api.status();
 
 interface DataValue {
   snapshot: StatusSnapshot | null;
@@ -82,12 +86,12 @@ function useLiveSnapshot(enabled: boolean) {
     if (inFlight.current) return;
     inFlight.current = true;
     try {
-      const snapshot = await api.status();
+      const snapshot = await fetchSnapshot();
       const fetchedAt = new Date();
       setState({ snapshot, fetchedAt, error: null });
       platform.storage.set(CACHE_KEY, { at: fetchedAt.toISOString(), snapshot });
     } catch (e) {
-      const error = e instanceof ApiError ? e.message : 'Something went wrong fetching the latest status.';
+      const error = e instanceof ApiError || DATA_SOURCE === 'direct' ? (e as Error).message : 'Couldn’t fetch the latest status.';
       setState((s) => ({ ...s, error }));
     } finally {
       inFlight.current = false;

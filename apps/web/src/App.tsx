@@ -1,4 +1,5 @@
 import { AnimatePresence, LayoutGroup, motion, MotionConfig } from 'motion/react';
+import { useEffect } from 'react';
 import { Icon, type IconName } from './components/Icon.tsx';
 import { Wordmark } from './components/Logo.tsx';
 import { ScenarioPicker } from './components/ScenarioPicker.tsx';
@@ -10,6 +11,7 @@ import { NoticeDetailScreen, NoticesScreen } from './screens/NoticesScreen.tsx';
 import { NowScreen } from './screens/NowScreen.tsx';
 import { Onboarding } from './screens/Onboarding.tsx';
 import { SettingsScreen } from './screens/SettingsScreen.tsx';
+import { onNotificationOpen } from './platform/index.ts';
 import { useAlertPrefsSync } from './state/alerts.ts';
 import { PrefsProvider, usePrefs } from './state/prefs.tsx';
 import { UiProvider, useUi } from './state/ui.tsx';
@@ -40,11 +42,12 @@ export function App() {
 }
 
 function Shell() {
-  const { route, path, direction } = useRouter();
+  const { route, path, direction, navigate } = useRouter();
   const { prefs } = usePrefs();
   const { scenariosOpen, closeScenarios, openScenarios, welcomeOpen } = useUi();
   const { mode, status } = useData();
   useAlertPrefsSync();
+  useEffect(() => onNotificationOpen((to) => navigate(to)), [navigate]);
 
   const activeTab = route.name === 'notice' ? 'notices' : route.name;
 
@@ -54,7 +57,7 @@ function Shell() {
         Skip to content
       </a>
       <header className="topbar">
-        <Link to="/" className="brand-link" aria-label="Mainsight home">
+        <Link to="/" className="brand-link" aria-label="everybody Hz home">
           <Wordmark />
         </Link>
         <LayoutGroup id="topnav">
