@@ -16,8 +16,8 @@ SITE_URL = "https://everybodyhz.pages.dev"
 [[d1_databases]]
 binding = "DB"
 database_name = "everybodyhz"
-# Replace with the id printed by `wrangler d1 create everybodyhz`.
-database_id = "00000000-0000-0000-0000-000000000000"
+# Created in Western Europe (weur); schema from migrations/0001_init.sql.
+database_id = "7a72ca4a-2ce0-4b92-b567-f66495e53d59"
 migrations_dir = "migrations"
 
 # Optional raw feed archive. Create with `wrangler r2 bucket create everybodyhz-archive`,

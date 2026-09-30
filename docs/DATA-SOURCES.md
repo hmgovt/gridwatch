@@ -26,6 +26,22 @@ Paths, parameters and field names were as expected, with one exception: `from` a
 - **The 28 September notice**, as published: issued 00:30 BST (1,400 MW shortfall, 16:00–19:00), updated 12:00 (104 MW), cancelled at 15:00. The press reported 15:58 for the cancellation; the feed says 15:00. The replay scenario is built from these messages verbatim (`packages/core/src/replay-2026-09-28.ts`).
 - **Demand Flexibility Service** messages stopped appearing on SYSWARN after March 2024.
 
+## Backtest: the 2–14 day margin forecast (OCNMFD)
+
+Checked 30 September 2026 against every forecast published June–September 2026 (36,452 rows, from `/datasets/OCNMFD/stream`, 7 days per request). "Lowest x%" ranks the day's forecast spare margin, made 2–5 days ahead, among 113 summer days (median 6,608 MW).
+
+| Margin notice day | 9–15 days ahead | 5–9 days ahead | 2–5 days ahead |
+|---|---|---|---|
+| 24 Jun | 6,330 MW | 209 MW | −1,015 MW (lowest 2%) |
+| 26 Jun | 5,982 | 4,833 | 4,532 (lowest 27%) |
+| 9 Jul | 3,884 | 2,154 | 1,977 (lowest 11%) |
+| 12 Aug | 6,474 | 6,473 | 6,048 (lowest 42%) |
+| 28 Sep | 8,821 | −1,088 | −1,141 (lowest of the summer) |
+
+- **3 of 5 notice days stood out days ahead**, and 28 September was flagged a week ahead.
+- **It also flags quiet days:** 9, 13 and 22 September and 30 June were in the lowest ten but had no notice.
+- So it's a "watch" signal for an outlook, not a warning. Combine it with wind, demand and outage data before promising anything.
+
 ## Still to verify
 
 1. **Rota letters:** the 18 letters (A–U without I, O and Q) in `packages/core/src/rota.ts` should be confirmed against the ESEC guidance revised in April 2026.
