@@ -6,6 +6,8 @@
 export const brand = {
   name: 'everybody Hz',
   tagline: 'Power cut early warning, in plain English',
+  /** Where share links point. Set VITE_SITE_URL when the domain is registered. */
+  siteUrl: (import.meta.env.VITE_SITE_URL ?? 'https://everybodyhz.pages.dev').replace(/\/$/, ''),
   description:
     'Early warning of power disruption in Great Britain: NESO’s grid notices, rotating power cuts, and what they mean for your home.',
 } as const;

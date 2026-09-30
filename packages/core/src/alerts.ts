@@ -58,6 +58,30 @@ function wants(prefs: AlertPrefs, minimum: Sensitivity): boolean {
   return RANK[prefs.sensitivity] >= RANK[minimum];
 }
 
+/** Every alert level, least to most. */
+export const SENSITIVITY_ORDER: readonly Sensitivity[] = ['essential', 'balanced', 'everything'];
+
+/**
+ * For topic-based push: the alert for a notice change, and every alert level
+ * that should get it. Notice alerts don't depend on who receives them beyond
+ * the level, so one message per change reaches everyone who asked for it.
+ */
+export function noticeBroadcast(
+  event: Extract<AlertEvent, { type: 'notice' }>,
+  now: Date,
+): { alert: Alert; audience: Sensitivity[] } | null {
+  let alert: Alert | null = null;
+  const audience: Sensitivity[] = [];
+  for (const sensitivity of SENSITIVITY_ORDER) {
+    const a = alertFor(event, { sensitivity }, now);
+    if (a) {
+      alert = a;
+      audience.push(sensitivity);
+    }
+  }
+  return alert ? { alert, audience } : null;
+}
+
 /** Decide whether and how to alert one subscriber about one change. */
 export function alertFor(event: AlertEvent, prefs: AlertPrefs, now: Date): Alert | null {
   return event.type === 'notice' ? noticeAlert(event, prefs, now) : rotationAlert(event, prefs, now);
@@ -105,8 +129,15 @@ function noticeAlert(
         urgency: 'normal',
       };
     case 'DCRP':
-      // Rotations are alerted through the published schedule, which says who is affected.
-      return null;
+      // The published schedule, when there is one, is alerted per block (rotationAlert).
+      // This is the warning itself, so nobody misses it if the schedule is late or absent.
+      return {
+        title: 'Rotating power cuts announced',
+        body: 'Open the app for your block’s times, and check NESO’s announcement.',
+        url: '/',
+        tag,
+        urgency: 'high',
+      };
     default:
       return {
         title: `${info.name}${when ? ` ${when}` : ''}`,

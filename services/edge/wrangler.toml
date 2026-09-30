@@ -1,0 +1,30 @@
+# everybody Hz server. Deploy: pnpm --filter @gridwatch/edge deploy
+# Setup and secrets: docs/DEPLOY.md
+name = "everybodyhz"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[triggers]
+# Every minute: NESO's warnings are checked within a minute of publication.
+crons = ["* * * * *"]
+
+[vars]
+# The public site that share links and posts point to.
+SITE_URL = "https://everybodyhz.pages.dev"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "everybodyhz"
+# Replace with the id printed by `wrangler d1 create everybodyhz`.
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+# Optional raw feed archive. Create with `wrangler r2 bucket create everybodyhz-archive`,
+# then uncomment. Use an EU jurisdiction bucket to keep data in Europe.
+# [[r2_buckets]]
+# binding = "ARCHIVE"
+# bucket_name = "everybodyhz-archive"
+
+[observability]
+enabled = true

@@ -1,0 +1,23 @@
+{
+  "name": "@gridwatch/edge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The production server: a Cloudflare Worker that checks NESO's warnings every minute, sends push alerts through Firebase topics and posts notices to social media. Holds no personal data.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --test-scheduled",
+    "deploy": "wrangler deploy",
+    "check:bundle": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
+    "db:migrate": "wrangler d1 migrations apply everybodyhz --remote",
+    "typecheck": "tsc -p .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@gridwatch/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260927.1",
+    "vitest": "5.0.2",
+    "wrangler": "4.143.0"
+  }
+}

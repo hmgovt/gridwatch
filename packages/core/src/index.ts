@@ -9,3 +9,4 @@ export * from './alerts.ts';
 export * from './scenarios.ts';
 export * from './elexon.ts';
 export * from './live.ts';
+export * from './share.ts';
